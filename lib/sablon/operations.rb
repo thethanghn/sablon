@@ -26,7 +26,7 @@ module Sablon
         value = conditon_expr.evaluate(context)
         to_test = nil
         if predicate
-          arg_matches = /(?<m>[^(]+)\s*\(\s*(?<args>[^(]+)\)\s*/.match(predicate)
+          arg_matches = /(?<m>==|!=|>+|<=|>|<)\s*(?<args>[^(]+)/.match(predicate)
           if arg_matches.nil?
             to_test = value.public_send(predicate)
           else

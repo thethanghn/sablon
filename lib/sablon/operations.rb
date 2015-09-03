@@ -24,7 +24,21 @@ module Sablon
     class Condition < Struct.new(:conditon_expr, :block, :predicate)
       def evaluate(context)
         value = conditon_expr.evaluate(context)
-        if truthy?(predicate ? value.public_send(predicate) : value)
+        to_test = nil
+        if predicate
+          arg_matches = /(?<m>[^(]+)\s*\(\s*(?<args>[^(]+)\)\s*/.match(predicate)
+          if arg_matches.nil?
+            to_test = value.public_send(predicate)
+          else
+            m = arg_matches[:m].strip
+            args = arg_matches[:args].split(",").map { |arg| arg.strip }
+            to_test = value.public_send(m, *args)
+          end
+        else
+          to_test = value
+        end
+
+        if truthy?(to_test)
           block.replace(block.process(context).reverse)
         else
           block.replace([])

@@ -24,7 +24,7 @@ module Sablon
     class Condition < Struct.new(:conditon_expr, :block, :predicate)
       def evaluate(context)
         value = conditon_expr.evaluate(context)
-        to_test = nil
+        to_test = false
         if predicate
           arg_matches = /(?<m>==|!=|>+|<=|>|<)\s*(?<args>[^(]+)/.match(predicate)
           if arg_matches.nil?
@@ -37,7 +37,7 @@ module Sablon
         else
           to_test = value
         end
-
+        
         if truthy?(to_test)
           block.replace(block.process(context).reverse)
         else
@@ -50,7 +50,7 @@ module Sablon
         when Array;
           !value.empty?
         else
-          !!value
+          !!value && value.to_s != ''
         end
       end
     end

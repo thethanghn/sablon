@@ -28,11 +28,11 @@ module Sablon
         if predicate
           arg_matches = /(?<m>==|!=|>+|<=|>|<)\s*(?<args>[^(]+)/.match(predicate)
           if arg_matches.nil?
-            to_test = value.public_send(predicate)
+            to_test = value.public_send(predicate) if value.respond_to?(predicate)
           else
             m = arg_matches[:m].strip
             args = arg_matches[:args].split(",").map { |arg| arg.strip }
-            to_test = value.public_send(m, *args)
+            to_test = value.public_send(m, *args) if value.respond_to?(m)
           end
         else
           to_test = value

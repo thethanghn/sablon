@@ -157,10 +157,6 @@ module Sablon
         @field = @fields.shift
         return unless @field
         case @field.expression
-        when /^=/
-          if allow_insertion
-            Statement::Insertion.new(Expression.parse(@field.expression[1..-1]), @field)
-          end
         when /([^ ]+):each\(([^ ]+)\)/
           block = consume_block("#{$1}:endEach")
           Statement::Loop.new(Expression.parse($1), $2, block)
@@ -170,6 +166,12 @@ module Sablon
         when /([^ ]+):if/
           block = consume_block("#{$1}:endIf")
           Statement::Condition.new(Expression.parse($1), block)
+        when /.+/
+          if allow_insertion
+            expr = @field.expression
+            expr = (expr[0] == '=' ? expr[1..-1] : expr[0..-1])
+            Statement::Insertion.new(Expression.parse(expr), @field)
+          end
         end
       end
 

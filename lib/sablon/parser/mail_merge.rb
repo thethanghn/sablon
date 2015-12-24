@@ -91,6 +91,30 @@ module Sablon
         alias_method :end_node, :start_node
       end
 
+      class TokenField < MergeField
+        TOKEN_PATTERN = /(\[[\w\s\-_]+\])/
+
+        def initialize(node)
+          @node = node
+          @raw_expression = get_display_node(@node)
+        end
+
+        def valid?
+          get_display_node(@node) && expression
+        end
+
+        def expression
+          $1 if @raw_expression && @raw_expression.text =~ TOKEN_PATTERN
+        end
+
+        def replace(content)
+          wt = get_display_node(@node)
+          if wt.content
+            wt.content = wt.text.gsub(expression, content.string)
+          end
+        end
+      end
+      
       def parse_fields(xml)
         fields = []
         xml.traverse do |node|
@@ -98,6 +122,8 @@ module Sablon
             field = SimpleField.new(node)
           elsif node.name == "fldChar" && node["w:fldCharType"] == "begin"
             field = build_complex_field(node)
+          elsif node.name == "r"
+            field = TokenField.new(node)
           end
           fields << field if field && field.valid?
         end

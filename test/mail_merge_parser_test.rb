@@ -254,4 +254,51 @@ xml
       wrap(xml)
     end
   end
+
+  class FldTokenTest < Sablon::TestCase
+    include SharedBehavior
+
+    def test_recognizes_expression
+      assert_equal ["[my_name]"], fields.map(&:expression)
+    end
+
+    def test_replace
+      field.replace(Sablon.content(:string, "Hello"))
+      xml = <<-xml.strip
+<w:p wsp:rsidP="0005494C" wsp:rsidR="0005494C" wsp:rsidRDefault="00D57DB2" wsp:rsidRPr="00285AD4">
+  <w:pPr>
+    <w:spacing w:line="360" w:line-rule="auto"/>
+    <w:rPr>
+      <w:rFonts w:ascii="Arial" w:h-ansi="Arial"/>
+      <wx:font wx:val="Arial"/>
+    </w:rPr>
+  </w:pPr>
+  <w:r>
+    <w:t>Hello</w:t>
+  </w:r>
+</w:p>
+xml
+      assert_equal body_xml.strip, xml.strip
+    end
+
+    private
+
+    def xml
+      xml = <<-xml.strip
+<w:p wsp:rsidP="0005494C" wsp:rsidR="0005494C" wsp:rsidRDefault="00D57DB2" wsp:rsidRPr="00285AD4">
+  <w:pPr>
+    <w:spacing w:line="360" w:line-rule="auto"/>
+    <w:rPr>
+      <w:rFonts w:ascii="Arial" w:h-ansi="Arial"/>
+      <wx:font wx:val="Arial"/>
+    </w:rPr>
+  </w:pPr>
+  <w:r>
+    <w:t>[my_name]</w:t>
+  </w:r>
+</w:p>
+xml
+      wrap(xml)
+    end
+  end
 end
